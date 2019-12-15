@@ -1,16 +1,7 @@
-import pandas as pd
 import numpy as np
 import random
 import copy
 from datafile import *
-from matplotlib import pyplot as plt
-
-
-# variables:
-# A - amount of workers
-# P - amount of publications
-# solution  is a list of decisions [i][j] telling if publication j of author i is taken into evaluation
-
 
 def fix_objective_function(solution_matrix):
     print('todo')
@@ -57,12 +48,12 @@ def randomly_change_n_positions(chosen_publications, n):
 
 def local_search(chosen_publications, max_attempts=50, neighbourhood_size=5):
     count = 0
-    local_solution = copy.deepcopy(chosen_publications)
+    new_solution = copy.deepcopy(chosen_publications)
     k = 1
     while count < max_attempts:
-        candidate = randomly_change_n_positions(local_solution, k)
-        if candidate[1] > chosen_publications[1]:
-            local_solution = copy.deepcopy(candidate)
+        candidate = randomly_change_n_positions(new_solution, k)
+        if candidate[1] > new_solution[1]:
+            new_solution = copy.deepcopy(candidate)
             k = 1
             count = 0
         else:
@@ -70,10 +61,10 @@ def local_search(chosen_publications, max_attempts=50, neighbourhood_size=5):
             if k > neighbourhood_size:
                 k = 1
             count = count + 1
-    return local_solution
+    return new_solution
 
 
-def variable_neighborhood_search(max_attempts=20, neighbourhood_size=5, iterations=100):
+def variable_neighborhood_search(max_attempts=20, neighbourhood_size=100, iterations=1000):
     count = 0
     new_solution = seed_solution()
     best_solution = copy.deepcopy(new_solution)
