@@ -92,10 +92,7 @@ def randomly_change_n_positions(chosen_publications, n):
     for k in range(n):
         i = random.randint(0, A-1)
         j = random.randint(0, P-1)
-        if new_point[i][j] > 0:
-            new_point[i][j] = 0
-        else:
-            new_point[i][j] = 1
+        new_point[i][j] = 1 if new_point[i][j] == 0 else 1
 
     return Solution(new_point)
 
@@ -152,7 +149,7 @@ def main():
     # for i, point in enumerate(points):
     #     file.write("Calculating point " + str(i))
     #     variable_neighborhood_search(point)
-
+    file.close()
     print("Algorithm end")
 
 
