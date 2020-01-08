@@ -114,8 +114,7 @@ def randomly_change_n_positions(chosen_publications, n):
     return Solution(new_point)
 
 
-def variable_neighborhood_search(init_solution, search_proportion=1 / 10,
-                                 max_neighborhood_radius=A*P):
+def variable_neighborhood_search(init_solution, search_proportion, max_neighborhood_radius):
     best_solution = init_solution
     count = 0
     iteration = 0
@@ -142,7 +141,7 @@ def variable_neighborhood_search(init_solution, search_proportion=1 / 10,
             radius += 1
             if radius > max_neighborhood_radius:
                 radius = 1
-        print("Iteration = ", iteration, ">> Score ", best_solution.value, "count = ", count)
+        print("Iteration = ", iteration, "Radius = ", radius , ">> Score ", best_solution.value, "count = ", count)
         iteration += 1
 
     return best_solution
@@ -153,9 +152,10 @@ def variable_neighborhood_search(init_solution, search_proportion=1 / 10,
 datafiles = os.listdir("data")
 
 for datafile in datafiles:
-    exec(open("data/" + datafile).read())
+    # change dartafiles[2] to datafile - for testing purpose only
+    exec(open("data/" + datafiles[2]).read())
     N = sum(czyN)
-    print("File - " + datafile)
+    print("File - " + datafiles[2])
     file.write("File - " + datafile)
     print("Cost function")
     file.write("---Cost function---")
@@ -163,7 +163,7 @@ for datafile in datafiles:
     for i, point in enumerate(points):
         print("Calculating point " + str(i))
         file.write("Calculating point " + str(i))
-        variable_neighborhood_search(point)
+        variable_neighborhood_search(point, 1/10, A*P)
 
     # print("Fix function")
     # file.write("---Fix function---")
