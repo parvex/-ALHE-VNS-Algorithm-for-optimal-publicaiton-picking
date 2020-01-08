@@ -2,7 +2,24 @@ import numpy as np
 import random
 import copy
 import math
-from datafile import *
+import os
+
+# datafile variables
+A = 0
+N0 = 0
+N1 = 0
+N2 = 0
+P = 0
+udzial = []
+doktorant = []
+pracownik = []
+czyN = []
+u = []
+w = []
+monografia = []
+authorIdList = []
+publicationIdList = []
+##########################
 
 N = sum(czyN)
 file = open("results.txt", "w+")
@@ -98,7 +115,7 @@ def randomly_change_n_positions(chosen_publications, n):
 
 
 def variable_neighborhood_search(init_solution, search_proportion=1 / 10,
-                                 max_neighborhood_radius=A * P):
+                                 max_neighborhood_radius=A*P):
     best_solution = init_solution
     count = 0
     iteration = 0
@@ -132,8 +149,14 @@ def variable_neighborhood_search(init_solution, search_proportion=1 / 10,
 
 
 # Run script
-def main():
-    print("Algorithm start")
+
+datafiles = os.listdir("data")
+
+for datafile in datafiles:
+    exec(open("data/" + datafile).read())
+    N = sum(czyN)
+    print("File - " + datafile)
+    file.write("File - " + datafile)
     print("Cost function")
     file.write("---Cost function---")
     points = gen_starting_points()
@@ -149,13 +172,9 @@ def main():
     # for i, point in enumerate(points):
     #     file.write("Calculating point " + str(i))
     #     variable_neighborhood_search(point)
-    file.close()
-    print("Algorithm end")
 
-
-if __name__ == "__main__":
-    main()
-
+file.close()
+print("Algorithm end")
 
 
 
