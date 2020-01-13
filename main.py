@@ -22,7 +22,6 @@ publicationIdList = []
 ##########################
 
 N = sum(czyN)
-file = open("results.txt", "w+")
 fix_function = False
 
 
@@ -49,7 +48,7 @@ def fix_point(point):
             fixed_point[publications[k][0][0]][publications[k][0][1]] = 0
             k += 1
 
-    return point
+    return fixed_point
 
 
 def author_cost(author_publications, author_index):
@@ -198,17 +197,19 @@ def variable_neighborhood_search(init_solution, search_proportion, max_neighborh
 datafiles = os.listdir("data")
 
 for datafile in datafiles:
+    neighborhood_param = 1/10
+    max_radius = 20
+
+    file = open("results/" + datafile + ".txt", "w+")
     # change dartafiles[2] to datafile - for testing purpose only
-    exec(open("data/" + datafiles[2]).read())
+    exec(open("data/" + datafile.read()))
     N = sum(czyN)
-    print("File - " + datafiles[2])
+    print("File - " + datafile)
     file.write("File - " + datafile + "\n")
     print("Cost function")
     file.write("---Cost function---\n")
     file.flush()
     points = gen_starting_points()
-    neighborhood_param = 1/10
-    max_radius = 20
     for i, point in enumerate(points):
         print("Calculating point: " + str(i) + " neighborhood param: "
               + str(neighborhood_param) + " max radius: " + str(max_radius))
@@ -217,13 +218,23 @@ for datafile in datafiles:
         file.flush()
         variable_neighborhood_search(point, neighborhood_param, max_radius)
 
-    # print("Fix function")
-    # file.write("---Fix function---")
-    # global fix_function
-    # fix_function = True
-    # for i, point in enumerate(points):
-    #     file.write("Calculating point " + str(i))
-    #     variable_neighborhood_search(point)
+    #calculation for fix function
+    fix_function = True
+    print("File - " + datafiles[2])
+    file.write("File - " + datafile + "\n")
+    print("Fix function")
+    file.write("---Fix function---\n")
+    file.flush()
+    points = gen_starting_points()
+    for i, point in enumerate(points):
+        print("Calculating point: " + str(i) + " neighborhood param: "
+              + str(neighborhood_param) + " max radius: " + str(max_radius))
+        file.write("Calculating point: " + str(i) + " neighborhood param: "
+              + str(neighborhood_param) + " max radius: " + str(max_radius) + "\n")
+        file.flush()
+        variable_neighborhood_search(point, neighborhood_param, max_radius)
+
+    file.close()
 
 file.close()
 print("Algorithm end")
