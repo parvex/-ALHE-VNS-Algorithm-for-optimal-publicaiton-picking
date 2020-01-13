@@ -163,7 +163,7 @@ def variable_neighborhood_search(init_solution, search_proportion, max_neighborh
     count = 0
     iteration = 0
     radius = 1
-    stage = 10
+    stage = 1
     stop = False
     while not stop:
         neighborhood = []
@@ -171,7 +171,8 @@ def variable_neighborhood_search(init_solution, search_proportion, max_neighborh
             neighborhood.append(randomly_change_n_positions(best_solution, radius))
             count += 1
             if count >= stage * A * P:
-                file.write("Stage: " + str(stage) + " * bits >> best_value:" + str(best_solution.value) + "\n")
+                file.write("Stage: " + str(stage) + "K >> best_value:" + str(best_solution.value) + "\n")
+                file.write("Found point: " + str(best_solution.point) + "\n")
                 file.flush()
                 if stage == 1000:
                     stop = True
@@ -201,9 +202,9 @@ for datafile in datafiles:
     max_radius = 20
 
     file = open("results/" + datafile + ".txt", "w+")
-    # change dartafiles[2] to datafile - for testing purpose only
-    exec(open("data/" + datafile.read()))
+    exec(open("data/" + datafile).read())
     N = sum(czyN)
+
     print("File - " + datafile)
     file.write("File - " + datafile + "\n")
     print("Cost function")
@@ -212,11 +213,13 @@ for datafile in datafiles:
     points = gen_starting_points()
     for i, point in enumerate(points):
         print("Calculating point: " + str(i) + " neighborhood param: "
-              + str(neighborhood_param) + " max radius: " + str(max_radius))
+              + str(neighborhood_param) + " max radius: " + str(max_radius) + " end at: count = " + str(1000 * A * P))
         file.write("Calculating point: " + str(i) + " neighborhood param: "
               + str(neighborhood_param) + " max radius: " + str(max_radius) + "\n")
         file.flush()
-        variable_neighborhood_search(point, neighborhood_param, max_radius)
+        solution = variable_neighborhood_search(point, neighborhood_param, max_radius)
+        file.write("Found point: " + str(solution.point) + "\n")
+        file.flush()
 
     #calculation for fix function
     fix_function = True
@@ -228,16 +231,16 @@ for datafile in datafiles:
     points = gen_starting_points()
     for i, point in enumerate(points):
         print("Calculating point: " + str(i) + " neighborhood param: "
-              + str(neighborhood_param) + " max radius: " + str(max_radius))
+              + str(neighborhood_param) + " max radius: " + str(max_radius) + " end at: count = " + str(1000 * A * P))
         file.write("Calculating point: " + str(i) + " neighborhood param: "
               + str(neighborhood_param) + " max radius: " + str(max_radius) + "\n")
         file.flush()
         variable_neighborhood_search(point, neighborhood_param, max_radius)
-
+        file.write("Found point: " + str(solution.point) + "\n")
+        file.flush()
     file.close()
 
-file.close()
-print("Algorithm end")
+print("PROGRAM END")
 
 
 
