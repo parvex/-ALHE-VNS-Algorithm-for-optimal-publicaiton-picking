@@ -58,6 +58,7 @@ def author_cost(author_publications, author_index):
     author_cost -= 4 * udzial[author_index]
     return author_cost
 
+
 def university_cost(point):
     university_cost = 0
     for i in range(A):
@@ -67,6 +68,7 @@ def university_cost(point):
     university_cost -= 3 * N
 
     return university_cost
+
 
 class Solution:
     def __init__(self, point):
@@ -127,6 +129,7 @@ def value_function(solution_matrix):
 
     return value
 
+
 def cost_value_function(solution_matrix, k=250):
     value = 0
     university_cost = 0
@@ -171,8 +174,12 @@ def variable_neighborhood_search(init_solution, search_proportion, max_neighborh
             neighborhood.append(randomly_change_n_positions(best_solution, radius))
             count += 1
             if count >= stage * A * P:
-                file.write("Stage: " + str(stage) + "K >> best_value:" + str(best_solution.value) + "\n")
-                file.write("Found point: " + str(best_solution.point) + "\n")
+                file.write("Stage: " + str(stage) + "K >> best_value: " + str(best_solution.value) + "\n")
+                if fix_function:
+                    file.write("Found point: " + str(best_solution.point) + "\n"
+                               + "Fixed point: " + str(best_solution.fixed_point) + "\n")
+                else:
+                    file.write("Found point: " + str(best_solution.point) + "\n")
                 file.flush()
                 if stage == 1000:
                     stop = True
@@ -201,10 +208,12 @@ for datafile in datafiles:
     neighborhood_param = 1/10
     max_radius = 20
 
+    #update global variables by executing data file
     file = open("results/" + datafile + ".txt", "w+")
     exec(open("data/" + datafile).read())
     N = sum(czyN)
 
+    #calculation for cost function
     print("File - " + datafile)
     file.write("File - " + datafile + "\n")
     print("Cost function")
@@ -223,7 +232,7 @@ for datafile in datafiles:
 
     #calculation for fix function
     fix_function = True
-    print("File - " + datafiles[2])
+    print("File - " + datafile)
     file.write("File - " + datafile + "\n")
     print("Fix function")
     file.write("---Fix function---\n")
@@ -235,8 +244,9 @@ for datafile in datafiles:
         file.write("Calculating point: " + str(i) + " neighborhood param: "
               + str(neighborhood_param) + " max radius: " + str(max_radius) + "\n")
         file.flush()
-        variable_neighborhood_search(point, neighborhood_param, max_radius)
-        file.write("Found point: " + str(solution.point) + "\n")
+        solution = variable_neighborhood_search(point, neighborhood_param, max_radius)
+        file.write("Found point: " + str(solution.point) + "\n"
+                   + "fixed point:" + str(solution.point) + "\n")
         file.flush()
     file.close()
 
