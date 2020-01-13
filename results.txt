@@ -1,0 +1,57 @@
+File - architektura_urbanistyka-input.py
+---Cost function---
+Calculating point: 0 neighborhood param: 0.1 max radius: 20
+Stage: 10 * bits >> best_value:994.1500000000001
+Stage: 100 * bits >> best_value:994.1500000000001
+Stage: 1000 * bits >> best_value:994.1500000000001
+Calculating point: 1 neighborhood param: 0.1 max radius: 20
+Stage: 10 * bits >> best_value:-6639.049999999999
+Stage: 100 * bits >> best_value:-6639.049999999999
+Stage: 1000 * bits >> best_value:-6639.049999999999
+Calculating point: 2 neighborhood param: 0.1 max radius: 20
+Stage: 10 * bits >> best_value:1077.6500000000003
+Stage: 100 * bits >> best_value:1077.6500000000003
+Stage: 1000 * bits >> best_value:1077.6500000000003
+Calculating point: 3 neighborhood param: 0.1 max radius: 20
+Stage: 10 * bits >> best_value:1036.0500000000002
+Stage: 100 * bits >> best_value:1036.0500000000002
+Stage: 1000 * bits >> best_value:1036.0500000000002
+Calculating point: 4 neighborhood param: 0.1 max radius: 20
+Stage: 10 * bits >> best_value:979.3500000000001
+Stage: 100 * bits >> best_value:979.3500000000001
+Stage: 1000 * bits >> best_value:979.3500000000001
+Calculating point: 5 neighborhood param: 0.1 max radius: 20
+Stage: 10 * bits >> best_value:1036.45
+Stage: 100 * bits >> best_value:1036.45
+Stage: 1000 * bits >> best_value:1036.45
+Calculating point: 6 neighborhood param: 0.1 max radius: 20
+Stage: 10 * bits >> best_value:1053.9
+Stage: 100 * bits >> best_value:1053.9
+Stage: 1000 * bits >> best_value:1053.9
+Calculating point: 7 neighborhood param: 0.1 max radius: 20
+Stage: 10 * bits >> best_value:1040.6000000000001
+Stage: 100 * bits >> best_value:1040.6000000000001
+Stage: 1000 * bits >> best_value:1040.6000000000001
+Calculating point: 8 neighborhood param: 0.1 max radius: 20
+Stage: 10 * bits >> best_value:1058.5500000000002
+Stage: 100 * bits >> best_value:1058.5500000000002
+Stage: 1000 * bits >> best_value:1058.5500000000002
+Calculating point: 9 neighborhood param: 0.1 max radius: 20
+Stage: 10 * bits >> best_value:1023.0500000000001
+Stage: 100 * bits >> best_value:1023.0500000000001
+Stage: 1000 * bits >> best_value:1023.0500000000001
+Calculating point: 10 neighborhood param: 0.1 max radius: 20
+Stage: 10 * bits >> best_value:968.9000000000001
+Stage: 100 * bits >> best_value:968.9000000000001
+Stage: 1000 * bits >> best_value:968.9000000000001
+Calculating point: 11 neighborhood param: 0.1 max radius: 20
+Stage: 10 * bits >> best_value:1057.5000000000002
+Stage: 100 * bits >> best_value:1057.5000000000002
+Stage: 1000 * bits >> best_value:1057.5000000000002
+Calculating point: 12 neighborhood param: 0.1 max radius: 20
+Stage: 10 * bits >> best_value:1052.45
+Stage: 100 * bits >> best_value:1052.45
+Stage: 1000 * bits >> best_value:1052.45
+Calculating point: 13 neighborhood param: 0.1 max radius: 20
+Stage: 10 * bits >> best_value:1035.8500000000001
+Stage: 100 * bits >> best_value:1035.8500000000001
