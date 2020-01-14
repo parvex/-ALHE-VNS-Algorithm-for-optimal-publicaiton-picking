@@ -4,33 +4,27 @@ import copy
 import math
 import os
 
-# datafile variables
-A = 0
-N0 = 0
-N1 = 0
-N2 = 0
-P = 0
-udzial = []
-doktorant = []
-pracownik = []
-czyN = []
-u = []
-w = []
-monografia = []
-authorIdList = []
-publicationIdList = []
-##########################
 
-N = sum(czyN)
+
 fix_function = False
 
+class Data:
+    def __init__(self, A, P, udzial, czyN, u, w, N):
+        self.A = copy.deepcopy(A)
+        self.P = copy.deepcopy(P)
+        self.udzial = np.array(udzial)
+        self.czyN = np.array(czyN)
+        self.u = np.array(u)
+        self.w = np.array(w)
+        self.N = np.array(N)
 
-def fix_point(point):
+
+def fix_point(point, data):
     fixed_point = copy.deepcopy(point)
-    for i in range(A):
-        if author_cost(fixed_point[i], i) > 0:
-            author_publications = [(j, w[i][j] / u[i][j]) for j in range(P)
-                                   if u[i][j] != 0 and fixed_point[i][j] != 0]
+    for i in range(data.A):
+        if author_cost(fixed_point[i], i, data) > 0:
+            author_publications = [(j, data.w[i][j] / data.u[i][j]) for j in range(data.P)
+                                   if data.u[i][j] != 0 and fixed_point[i][j] != 0]
             author_publications.sort(key=lambda x: x[1], reverse=False)
             fixed_point[i][author_publications[0][0]] = 0
             k = 1
@@ -38,9 +32,9 @@ def fix_point(point):
                 fixed_point[i][author_publications[k][0]] = 0
                 k += 1
 
-    if university_cost(fixed_point) > 0:
-        publications = [((i, j), w[i][j] / u[i][j]) for i in range(A) for j in range(P)
-                        if u[i][j] != 0 and fixed_point[i][j] != 0]
+    if university_cost(fixed_point, data) > 0:
+        publications = [((i, j), data.w[i][j] / data.u[i][j]) for i in range(data.A) for j in range(data.P)
+                        if data.u[i][j] != 0 and fixed_point[i][j] != 0]
         publications.sort(key=lambda x: x[1], reverse=False)
         fixed_point[publications[0][0][0]][publications[0][0][1]] = 0
         k = 1
@@ -51,117 +45,117 @@ def fix_point(point):
     return fixed_point
 
 
-def author_cost(author_publications, author_index):
+def author_cost(author_publications, author_index, data):
     author_cost = 0
-    for j in range(P):
-        author_cost += author_publications[j] * u[author_index][j]
-    author_cost -= 4 * udzial[author_index]
+    for j in range(data.P):
+        author_cost += author_publications[j] * data.u[author_index][j]
+    author_cost -= 4 * data.udzial[author_index]
     return author_cost
 
 
-def university_cost(point):
+def university_cost(point, data):
     university_cost = 0
-    for i in range(A):
-        for j in range(P):
-            university_cost += point[i][j] * u[i][j]
+    for i in range(data.A):
+        for j in range(data.P):
+            university_cost += point[i][j] * data.u[i][j]
 
-    university_cost -= 3 * N
+    university_cost -= 3 * data.N
 
     return university_cost
 
 
 class Solution:
-    def __init__(self, point):
+    def __init__(self, point, data):
         self.point = point
         if fix_function:
             self.fixed_point = fix_point(point)
-            self.value = value_function(self.fixed_point)
+            self.value = value_function(self.fixed_point, data)
         else:
-            self.value = cost_value_function(point)
+            self.value = cost_value_function(point, data)
 
 
-def greedy_pick_point_gen():
-    point = np.zeros((A, P), dtype=int)
-    for i in range(A):
-        param_list = [((j, w[i][j] / u[i][j]) if u[i][j] != 0 else (j, 0)) for j in range(0, P)]
+def greedy_pick_point_gen(data):
+    point = np.zeros((data.A, data.P), dtype=int)
+    for i in range(data.A):
+        param_list = [((j, data.w[i][j] / data.u[i][j]) if data.u[i][j] != 0 else (j, 0)) for j in range(0, data.P)]
         param_list.sort(key=lambda x: x[1], reverse=True)
-        u_value = u[i][param_list[0][0]]
+        u_value = data.u[i][param_list[0][0]]
         k = 1
-        while u_value <= 4 * udzial[i]:
+        while u_value <= 4 * data.udzial[i]:
             point[i][param_list[k - 1][0]] = 1
-            if k >= P-1:
+            if k >= data.P-1:
                 break
-            u_value += u[i][param_list[k][0]]
+            u_value += data.u[i][param_list[k][0]]
             k += 1
 
     return point
 
 
-def random_pick_point_gen():
-    point = np.zeros((A, P), dtype=int)
-    for i in range(A):
-        indexes = random.sample(range(P), P)
-        u_value = u[i][indexes[0]]
+def random_pick_point_gen(data):
+    point = np.zeros((data.A, data.P), dtype=int)
+    for i in range(data.A):
+        indexes = random.sample(range(data.P), data.P)
+        u_value = data.u[i][indexes[0]]
         k = 1
-        while u_value <= 4 * udzial[i]:
+        while u_value <= 4 * data.udzial[i]:
             point[i][indexes[k - 1]] = 1
-            u_value += u[i][indexes[k]]
-            if k >= P-1:
+            u_value += data.u[i][indexes[k]]
+            if k >= data.P-1:
                 break
             k += 1
 
     return point
 
 
-def gen_starting_points():
-    points = [Solution(np.zeros((A, P), dtype=int)), Solution(np.ones((A, P), dtype=int)),
-              Solution(greedy_pick_point_gen())]
+def gen_starting_points(data):
+    points = [Solution(np.zeros((data.A, data.P), dtype=int), data), Solution(np.ones((data.A, data.P), dtype=int), data),
+              Solution(greedy_pick_point_gen(data), data)]
     for i in range(25):
-        points.append(Solution(random_pick_point_gen()))
+        points.append(Solution(random_pick_point_gen(data), data))
     return points
 
 
-def value_function(solution_matrix):
+def value_function(solution_matrix, data):
     value = 0
-    for i in range(A):
-        for j in range(P):
-            value += solution_matrix[i][j] * w[i][j]
+    for i in range(data.A):
+        for j in range(data.P):
+            value += solution_matrix[i][j] * data.w[i][j]
 
     return value
 
 
-def cost_value_function(solution_matrix, k=250):
+def cost_value_function(solution_matrix, data, k=250):
     value = 0
     university_cost = 0
-    for i in range(A):
+    for i in range(data.A):
         author_cost = 0
-        for j in range(P):
-            value += solution_matrix[i][j] * w[i][j]
-            author_cost += solution_matrix[i][j] * u[i][j]
-            university_cost += solution_matrix[i][j] * u[i][j]
-        author_cost -= 4 * udzial[i]
+        for j in range(data.P):
+            value += solution_matrix[i][j] * data.w[i][j]
+            author_cost += solution_matrix[i][j] * data.u[i][j]
+            university_cost += solution_matrix[i][j] * data.u[i][j]
+        author_cost -= 4 * data.udzial[i]
 
         if author_cost > 0:
             value -= k * (1 + author_cost)
 
-    university_cost -= 3 * N
+    university_cost -= 3 * data.N
     if university_cost > 0:
         value -= k * (1 + university_cost)
 
     return value
 
 
-def randomly_change_n_positions(chosen_publications, n):
+def randomly_change_n_positions(chosen_publications, n, data):
     new_point = copy.deepcopy(chosen_publications.point)
     for k in range(n):
-        i = random.randint(0, A-1)
-        j = random.randint(0, P-1)
+        i = random.randint(0, data.A-1)
+        j = random.randint(0, data.P-1)
         new_point[i][j] = 1 if new_point[i][j] == 0 else 1
 
-    return Solution(new_point)
+    return Solution(new_point, data)
 
 
-def variable_neighborhood_search(init_solution, search_proportion, max_neighborhood_radius):
+def variable_neighborhood_search(init_solution, search_proportion, max_neighborhood_radius, data, file):
     best_solution = init_solution
     count = 0
     iteration = 0
@@ -170,10 +164,11 @@ def variable_neighborhood_search(init_solution, search_proportion, max_neighborh
     stop = False
     while not stop:
         neighborhood = []
-        for i in range(math.floor(search_proportion * A * P * radius)):
-            neighborhood.append(randomly_change_n_positions(best_solution, radius))
+        for i in range(math.floor(search_proportion * data.A * data.P * radius)):
+            neighborhood.append(randomly_change_n_positions(best_solution, radius, data))
             count += 1
-            if count >= stage * A * P:
+            if count >= 400:
+                exit(0)
                 file.write("Stage: " + str(stage) + "K >> best_value: " + str(best_solution.value) + "\n")
                 if fix_function:
                     file.write("Found point: " + str(best_solution.point) + "\n"
@@ -200,58 +195,63 @@ def variable_neighborhood_search(init_solution, search_proportion, max_neighborh
     return best_solution
 
 
-# Run script
+def main():
+    datafiles = os.listdir("data")
 
-datafiles = os.listdir("data")
+    for datafile in datafiles:
+        neighborhood_param = 1 / 10
+        max_radius = 20
 
-for datafile in datafiles:
-    neighborhood_param = 1/10
-    max_radius = 20
+        # update global variables by executing data file
+        file = open("results/" + datafile + ".txt", "w+")
+        exec(open("data/" + datafile).read())
 
-    #update global variables by executing data file
-    file = open("results/" + datafile + ".txt", "w+")
-    exec(open("data/" + datafile).read())
-    N = sum(czyN)
+        N = sum(czyN)
 
-    #calculation for cost function
-    print("File - " + datafile)
-    file.write("File - " + datafile + "\n")
-    print("Cost function")
-    file.write("---Cost function---\n")
-    file.flush()
-    points = gen_starting_points()
-    for i, point in enumerate(points):
-        print("Calculating point: " + str(i) + " neighborhood param: "
-              + str(neighborhood_param) + " max radius: " + str(max_radius) + " end at: count = " + str(1000 * A * P))
-        file.write("Calculating point: " + str(i) + " neighborhood param: "
-              + str(neighborhood_param) + " max radius: " + str(max_radius) + "\n")
+        data = Data(A, P, udzial, czyN, u, w, N)
+        # calculation for cost function
+        print("File - " + datafile)
+        file.write("File - " + datafile + "\n")
+        print("Cost function")
+        file.write("---Cost function---\n")
         file.flush()
-        solution = variable_neighborhood_search(point, neighborhood_param, max_radius)
-        file.write("Found point: " + str(solution.point) + "\n")
+        points = gen_starting_points(data)
+        for i, point in enumerate(points):
+            print("Calculating point: " + str(i) + " neighborhood param: "
+                  + str(neighborhood_param) + " max radius: " + str(max_radius) + " end at: count = " + str(
+                1000 * A * P))
+            file.write("Calculating point: " + str(i) + " neighborhood param: "
+                       + str(neighborhood_param) + " max radius: " + str(max_radius) + "\n")
+            file.flush()
+            solution = variable_neighborhood_search(point, neighborhood_param, max_radius, data, file)
+            file.write("Found point: " + str(solution.point) + "\n")
+            file.flush()
+
+        # calculation for fix function
+        fix_function = True
+        print("File - " + datafile)
+        file.write("File - " + datafile + "\n")
+        print("Fix function")
+        file.write("---Fix function---\n")
         file.flush()
+        points = gen_starting_points()
+        for i, point in enumerate(points):
+            print("Calculating point: " + str(i) + " neighborhood param: "
+                  + str(neighborhood_param) + " max radius: " + str(max_radius) + " end at: count = " + str(
+                1000 * A * P))
+            file.write("Calculating point: " + str(i) + " neighborhood param: "
+                       + str(neighborhood_param) + " max radius: " + str(max_radius) + "\n")
+            file.flush()
+            solution = variable_neighborhood_search(point, neighborhood_param, max_radius, data, file)
+            file.write("Found point: " + str(solution.point) + "\n"
+                       + "fixed point:" + str(solution.point) + "\n")
+            file.flush()
+        file.close()
 
-    #calculation for fix function
-    fix_function = True
-    print("File - " + datafile)
-    file.write("File - " + datafile + "\n")
-    print("Fix function")
-    file.write("---Fix function---\n")
-    file.flush()
-    points = gen_starting_points()
-    for i, point in enumerate(points):
-        print("Calculating point: " + str(i) + " neighborhood param: "
-              + str(neighborhood_param) + " max radius: " + str(max_radius) + " end at: count = " + str(1000 * A * P))
-        file.write("Calculating point: " + str(i) + " neighborhood param: "
-              + str(neighborhood_param) + " max radius: " + str(max_radius) + "\n")
-        file.flush()
-        solution = variable_neighborhood_search(point, neighborhood_param, max_radius)
-        file.write("Found point: " + str(solution.point) + "\n"
-                   + "fixed point:" + str(solution.point) + "\n")
-        file.flush()
-    file.close()
-
-print("PROGRAM END")
+    print("PROGRAM END")
 
 
+if __name__ == "__main__":
+    main()
 
 
