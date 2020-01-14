@@ -26,39 +26,42 @@ class Data:
 
 def fix_point(point, data):
     fixed_point = copy.deepcopy(point)
+    author_costs = np.sum(fixed_point * data.u, axis=1) - 4*data.udzial
+
     for i in range(data.A):
         #if author cost is greater than 0
-        if np.sum(fixed_point[i] * data.u[i]) - 4 * data.udzial[i] > 0:
-            author_publications = [(j, data.w[i][j] / data.u[i][j]) for j in range(data.P)
-                                   if data.u[i][j] != 0 and fixed_point[i][j] != 0]
-            author_publications.sort(key=lambda x: x[1], reverse=False)
-            fixed_point[i][author_publications[0][0]] = 0
-            k = 1
+        if author_costs[i] > 0:
+            author_publications = data.w[i] / data.u[i] / fixed_point[i]
+            min_ind = np.unravel_index(np.nanargmin(author_publications, axis=None), author_publications.shape)
+            fixed_point[i][min_ind] = 0
+            author_publications[min_ind] = float("NaN")
+            # if author cost is greater than 0
             while np.sum(fixed_point[i] * data.u[i]) - 4 * data.udzial[i] > 0:
-                fixed_point[i][author_publications[k][0]] = 0
-                k += 1
+                min_ind = np.unravel_index(np.nanargmin(author_publications, axis=None), author_publications.shape)
+                fixed_point[i][min_ind] = 0
+                author_publications[min_ind] = float("NaN")
 
     #if university cost is greater than 0
-    if np.sum(point * data.u) - 3*data.N > 0:
-        publications = [((i, j), data.w[i][j] / data.u[i][j]) for i in range(data.A) for j in range(data.P)
-                        if data.u[i][j] != 0 and fixed_point[i][j] != 0]
-        publications.sort(key=lambda x: x[1], reverse=False)
-        fixed_point[publications[0][0][0]][publications[0][0][1]] = 0
-        k = 1
-        while np.sum(point * data.u) - 3*data.N > 0:
-            fixed_point[publications[k][0][0]][publications[k][0][1]] = 0
-            k += 1
+    if np.sum(fixed_point * data.u) - 3*data.N > 0:
+        publications = data.w / data.u / fixed_point
+        min_ind = np.unravel_index(np.nanargmin(publications, axis=None), publications.shape)
+        fixed_point[min_ind[0]][min_ind[1]] = 0
+        publications[min_ind[0]][min_ind[1]] = float("NaN")
+        while np.sum(fixed_point * data.u) - 3*data.N > 0:
+            min_ind = np.unravel_index(np.nanargmin(publications, axis=None), publications.shape)
+            fixed_point[min_ind[0]][min_ind[1]] = 0
+            publications[min_ind[0]][min_ind[1]] = float("NaN")
 
     return fixed_point
 
 
 class Solution:
     def __init__(self, point, data):
-        self.point = point
         if fix_function:
-            self.fixed_point = fix_point(point)
-            self.value = value_function(self.fixed_point, data)
+            self.point = fix_point(point, data)
+            self.value = value_function(self.point, data)
         else:
+            self.point = point
             self.value = cost_value_function(point, data)
 
 
@@ -104,7 +107,7 @@ def gen_starting_points(data):
 
 
 def value_function(solution_matrix, data):
-    value = sum(solution_matrix * data.w)
+    value = np.sum(solution_matrix * data.w)
     return value
 
 
@@ -148,11 +151,7 @@ def variable_neighborhood_search(init_solution, search_proportion, max_neighborh
             count += 1
             if count >= data.A * data.P * stage:
                 file.write("Stage: " + str(stage) + "K >> best_value: " + str(best_solution.value) + "\n")
-                if fix_function:
-                    file.write("Found point: " + str(best_solution.point) + "\n"
-                               + "Fixed point: " + str(best_solution.fixed_point) + "\n")
-                else:
-                    file.write("Found point: " + str(best_solution.point) + "\n")
+                file.write("Found point: " + str(best_solution.point) + "\n")
                 file.flush()
                 if stage == 1000:
                     stop = True
@@ -178,6 +177,7 @@ def run_file(datafile):
     max_radius = 20
     file = open("results/" + datafile + ".txt", "w+")
     data = Data(A, P, udzial, czyN, u, w, N)
+    points = gen_starting_points(data)
 
     # calculation for cost function
     print("File - " + datafile)
@@ -185,7 +185,6 @@ def run_file(datafile):
     print("Cost function")
     file.write("---Cost function---\n")
     file.flush()
-    points = gen_starting_points(data)
     for i, point in enumerate(points):
         print("Calculating point: " + str(i) + " neighborhood param: "
               + str(neighborhood_param) + " max radius: " + str(max_radius) + " end at: count = " + str(
@@ -198,13 +197,13 @@ def run_file(datafile):
         file.flush()
 
     # calculation for fix function
+    global fix_function
     fix_function = True
     print("File - " + datafile)
     file.write("File - " + datafile + "\n")
     print("Fix function")
     file.write("---Fix function---\n")
     file.flush()
-    points = gen_starting_points(data)
     for i, point in enumerate(points):
         print("Calculating point: " + str(i) + " neighborhood param: "
               + str(neighborhood_param) + " max radius: " + str(max_radius) + " end at: count = " + str(1000 * A * P))
@@ -212,18 +211,17 @@ def run_file(datafile):
                    + str(neighborhood_param) + " max radius: " + str(max_radius) + "\n")
         file.flush()
         solution = variable_neighborhood_search(point, neighborhood_param, max_radius, data, file)
-        file.write("Found point: " + str(solution.point) + "\n"
-                   + "fixed point:" + str(solution.point) + "\n")
+        file.write("Found point: " + str(solution.point) + "\n")
         file.flush()
     file.close()
 
-print("PROGRAM END")
-
 if __name__ == "__main__":
     datafiles = os.listdir("data")
-
+    np.seterr(divide='ignore', invalid='ignore')
     for datafile in datafiles:
         #updating global variables
         exec(open("data/" + datafiles[0]).read())
         N = sum(czyN)
         run_file(datafile)
+
+    print("PROGRAM END")
