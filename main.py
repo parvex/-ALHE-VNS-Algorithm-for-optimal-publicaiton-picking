@@ -99,7 +99,9 @@ def random_pick_point_gen(data):
 
 
 def gen_starting_points(data):
-    points = [Solution(np.ones((data.A, data.P), dtype=int), data)]
+    points = [Solution(np.zeros((data.A, data.P), dtype=int), data),
+              Solution(np.ones((data.A, data.P), dtype=int), data),
+              Solution(greedy_pick_point_gen(data), data)]
     for i in range(25):
         points.append(Solution(random_pick_point_gen(data), data))
     return points
