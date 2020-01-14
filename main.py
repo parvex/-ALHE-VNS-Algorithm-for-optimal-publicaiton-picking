@@ -99,8 +99,7 @@ def random_pick_point_gen(data):
 
 
 def gen_starting_points(data):
-    points = [Solution(np.zeros((data.A, data.P), dtype=int), data), Solution(np.ones((data.A, data.P), dtype=int), data),
-              Solution(greedy_pick_point_gen(data), data)]
+    points = [Solution(np.ones((data.A, data.P), dtype=int), data)]
     for i in range(25):
         points.append(Solution(random_pick_point_gen(data), data))
     return points
@@ -132,7 +131,7 @@ def randomly_change_n_positions(chosen_publications, n, data):
     for k in range(n):
         i = random.randint(0, data.A-1)
         j = random.randint(0, data.P-1)
-        new_point[i][j] = 1 if new_point[i][j] == 0 else 1
+        new_point[i][j] = 1 if new_point[i][j] == 0 else 0
 
     return Solution(new_point, data)
 
@@ -151,7 +150,8 @@ def variable_neighborhood_search(init_solution, search_proportion, max_neighborh
             count += 1
             if count >= data.A * data.P * stage:
                 file.write("Stage: " + str(stage) + "K >> best_value: " + str(best_solution.value) + "\n")
-                file.write("Found point: " + str(best_solution.point) + "\n")
+                file.write("Found point:\n")
+                np.savetxt(file, best_solution.point.astype(int), fmt='%i')
                 file.flush()
                 if stage == 1000:
                     stop = True
@@ -190,7 +190,8 @@ def run_file(datafile):
               + str(neighborhood_param) + " max radius: " + str(max_radius) + " end at: count = " + str(1000 * A * P))
         file.write("Calculating point: " + str(i) + " neighborhood param: "
                    + str(neighborhood_param) + " max radius: " + str(max_radius) + "\n"
-                   + "Point:" + str(point.point) + "\n")
+                   + "Point:\n")
+        np.savetxt(file, point.point.astype(int), fmt='%i')
         file.flush()
         solution = variable_neighborhood_search(point, neighborhood_param, max_radius, data, file)
         file.write("Found point: " + str(solution.point) + "\n")
@@ -209,7 +210,8 @@ def run_file(datafile):
               + str(neighborhood_param) + " max radius: " + str(max_radius) + " end at: count = " + str(1000 * A * P))
         file.write("Calculating point: " + str(i) + " neighborhood param: "
                    + str(neighborhood_param) + " max radius: " + str(max_radius) + "\n"
-                   + "Point:" + str(point.point) + "\n")
+                   + "Point:\n")
+        np.savetxt(file, point.point.astype(int), fmt='%i')
         file.flush()
         solution = variable_neighborhood_search(point, neighborhood_param, max_radius, data, file)
         file.write("Found point: " + str(solution.point) + "\n")
@@ -219,10 +221,9 @@ def run_file(datafile):
 if __name__ == "__main__":
     datafiles = os.listdir("data")
     np.seterr(divide='ignore', invalid='ignore')
-    for datafile in datafiles:
-        #updating global variables
-        exec(open("data/" + datafiles[0]).read())
-        N = sum(czyN)
-        run_file(datafile)
+    #updating global variables
+    exec(open("data/" + datafiles[0]).read())
+    N = sum(czyN)
+    run_file(datafiles[0])
 
     print("PROGRAM END")
