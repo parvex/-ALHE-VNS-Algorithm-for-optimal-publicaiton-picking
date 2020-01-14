@@ -51,21 +51,12 @@ def fix_point(point, data):
 
 
 def author_cost(author_publications, author_index, data):
-    author_cost = 0
-    for j in range(data.P):
-        author_cost += author_publications[j] * data.u[author_index][j]
-    author_cost -= 4 * data.udzial[author_index]
+    author_cost = np.sum(author_publications * data.u[author_index]) - 4 * data.udzial[author_index]
     return author_cost
 
 
 def university_cost(point, data):
-    university_cost = 0
-    for i in range(data.A):
-        for j in range(data.P):
-            university_cost += point[i][j] * data.u[i][j]
-
-    university_cost -= 3 * data.N
-
+    university_cost = np.sum(point * data.u) - 3*data.N
     return university_cost
 
 
@@ -129,7 +120,7 @@ def value_function(solution_matrix, data):
 def cost_value_function(solution_matrix, data, k=250):
     value = np.sum(solution_matrix * data.w)
     cost_matrix = solution_matrix * data.u
-    university_cost = np.sum(cost_matrix)
+    university_cost = np.sum(cost_matrix) - 3*N
     author_costs = np.sum(cost_matrix, axis=1) - 4*data.udzial
 
     for i in range(data.A):
@@ -193,14 +184,11 @@ def variable_neighborhood_search(init_solution, search_proportion, max_neighborh
 
 def main():
     datafiles = os.listdir("data")
-
     neighborhood_param = 1 / 10
     max_radius = 20
-
-    # update global variables by executing data file
     file = open("results/" + datafiles[0] + ".txt", "w+")
-
     data = Data(A, P, udzial, czyN, u, w, N)
+
     # calculation for cost function
     print("File - " + datafiles[0])
     file.write("File - " + datafiles[0] + "\n")
