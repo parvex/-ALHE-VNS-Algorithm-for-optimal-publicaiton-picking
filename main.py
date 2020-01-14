@@ -27,37 +27,29 @@ class Data:
 def fix_point(point, data):
     fixed_point = copy.deepcopy(point)
     for i in range(data.A):
-        if author_cost(fixed_point[i], i, data) > 0:
+        #if author cost is greater than 0
+        if np.sum(fixed_point[i] * data.u[i]) - 4 * data.udzial[i] > 0:
             author_publications = [(j, data.w[i][j] / data.u[i][j]) for j in range(data.P)
                                    if data.u[i][j] != 0 and fixed_point[i][j] != 0]
             author_publications.sort(key=lambda x: x[1], reverse=False)
             fixed_point[i][author_publications[0][0]] = 0
             k = 1
-            while author_cost(fixed_point[i], i) > 0:
+            while np.sum(fixed_point[i] * data.u[i]) - 4 * data.udzial[i] > 0:
                 fixed_point[i][author_publications[k][0]] = 0
                 k += 1
 
-    if university_cost(fixed_point, data) > 0:
+    #if university cost is greater than 0
+    if np.sum(point * data.u) - 3*data.N > 0:
         publications = [((i, j), data.w[i][j] / data.u[i][j]) for i in range(data.A) for j in range(data.P)
                         if data.u[i][j] != 0 and fixed_point[i][j] != 0]
         publications.sort(key=lambda x: x[1], reverse=False)
         fixed_point[publications[0][0][0]][publications[0][0][1]] = 0
         k = 1
-        while university_cost(fixed_point) > 0:
+        while np.sum(point * data.u) - 3*data.N > 0:
             fixed_point[publications[k][0][0]][publications[k][0][1]] = 0
             k += 1
 
     return fixed_point
-
-
-def author_cost(author_publications, author_index, data):
-    author_cost = np.sum(author_publications * data.u[author_index]) - 4 * data.udzial[author_index]
-    return author_cost
-
-
-def university_cost(point, data):
-    university_cost = np.sum(point * data.u) - 3*data.N
-    return university_cost
 
 
 class Solution:
@@ -104,9 +96,8 @@ def random_pick_point_gen(data):
 
 
 def gen_starting_points(data):
-    # points = [Solution(np.zeros((data.A, data.P), dtype=int), data), Solution(np.ones((data.A, data.P), dtype=int), data),
-    #           Solution(greedy_pick_point_gen(data), data)]
-    points = [Solution(greedy_pick_point_gen(data), data)]
+    points = [Solution(np.zeros((data.A, data.P), dtype=int), data), Solution(np.ones((data.A, data.P), dtype=int), data),
+              Solution(greedy_pick_point_gen(data), data)]
     for i in range(25):
         points.append(Solution(random_pick_point_gen(data), data))
     return points
@@ -182,16 +173,15 @@ def variable_neighborhood_search(init_solution, search_proportion, max_neighborh
     return best_solution
 
 
-def main():
-    datafiles = os.listdir("data")
+def run_file(datafile):
     neighborhood_param = 1 / 10
     max_radius = 20
-    file = open("results/" + datafiles[0] + ".txt", "w+")
+    file = open("results/" + datafile + ".txt", "w+")
     data = Data(A, P, udzial, czyN, u, w, N)
 
     # calculation for cost function
-    print("File - " + datafiles[0])
-    file.write("File - " + datafiles[0] + "\n")
+    print("File - " + datafile)
+    file.write("File - " + datafile + "\n")
     print("Cost function")
     file.write("---Cost function---\n")
     file.flush()
@@ -209,16 +199,15 @@ def main():
 
     # calculation for fix function
     fix_function = True
-    print("File - " + datafiles[0])
-    file.write("File - " + datafiles[0] + "\n")
+    print("File - " + datafile)
+    file.write("File - " + datafile + "\n")
     print("Fix function")
     file.write("---Fix function---\n")
     file.flush()
-    points = gen_starting_points()
+    points = gen_starting_points(data)
     for i, point in enumerate(points):
         print("Calculating point: " + str(i) + " neighborhood param: "
-              + str(neighborhood_param) + " max radius: " + str(max_radius) + " end at: count = " + str(
-            1000 * A * P))
+              + str(neighborhood_param) + " max radius: " + str(max_radius) + " end at: count = " + str(1000 * A * P))
         file.write("Calculating point: " + str(i) + " neighborhood param: "
                    + str(neighborhood_param) + " max radius: " + str(max_radius) + "\n")
         file.flush()
@@ -232,6 +221,9 @@ print("PROGRAM END")
 
 if __name__ == "__main__":
     datafiles = os.listdir("data")
-    exec(open("data/" + datafiles[0]).read())
-    N = sum(czyN)
-    main()
+
+    for datafile in datafiles:
+        #updating global variables
+        exec(open("data/" + datafiles[0]).read())
+        N = sum(czyN)
+        run_file(datafile)
