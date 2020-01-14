@@ -195,8 +195,7 @@ def run_file(datafile):
                    + "Point:\n")
         np.savetxt(file, point.point.astype(int), fmt='%i')
         file.flush()
-        solution = variable_neighborhood_search(point, neighborhood_param, max_radius, data, file)
-        file.write("Found point: " + str(solution.point) + "\n")
+        variable_neighborhood_search(point, neighborhood_param, max_radius, data, file)
         file.flush()
 
     # calculation for fix function
@@ -215,8 +214,7 @@ def run_file(datafile):
                    + "Point:\n")
         np.savetxt(file, point.point.astype(int), fmt='%i')
         file.flush()
-        solution = variable_neighborhood_search(point, neighborhood_param, max_radius, data, file)
-        file.write("Found point: " + str(solution.point) + "\n")
+        variable_neighborhood_search(point, neighborhood_param, max_radius, data, file)
         file.flush()
     file.close()
 
@@ -224,8 +222,9 @@ if __name__ == "__main__":
     datafiles = os.listdir("data")
     np.seterr(divide='ignore', invalid='ignore')
     #updating global variables
-    exec(open("data/" + datafiles[0]).read())
-    N = sum(czyN)
-    run_file(datafiles[0])
+    for datafile in datafiles:
+        exec(open("data/" + datafile).read())
+        N = sum(czyN)
+        run_file(datafile)
 
     print("PROGRAM END")
