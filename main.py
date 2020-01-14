@@ -187,10 +187,10 @@ def run_file(datafile):
     file.flush()
     for i, point in enumerate(points):
         print("Calculating point: " + str(i) + " neighborhood param: "
-              + str(neighborhood_param) + " max radius: " + str(max_radius) + " end at: count = " + str(
-            1000 * A * P))
+              + str(neighborhood_param) + " max radius: " + str(max_radius) + " end at: count = " + str(1000 * A * P))
         file.write("Calculating point: " + str(i) + " neighborhood param: "
-                   + str(neighborhood_param) + " max radius: " + str(max_radius) + "\n")
+                   + str(neighborhood_param) + " max radius: " + str(max_radius) + "\n"
+                   + "Point:" + str(point.point) + "\n")
         file.flush()
         solution = variable_neighborhood_search(point, neighborhood_param, max_radius, data, file)
         file.write("Found point: " + str(solution.point) + "\n")
@@ -208,7 +208,8 @@ def run_file(datafile):
         print("Calculating point: " + str(i) + " neighborhood param: "
               + str(neighborhood_param) + " max radius: " + str(max_radius) + " end at: count = " + str(1000 * A * P))
         file.write("Calculating point: " + str(i) + " neighborhood param: "
-                   + str(neighborhood_param) + " max radius: " + str(max_radius) + "\n")
+                   + str(neighborhood_param) + " max radius: " + str(max_radius) + "\n"
+                   + "Point:" + str(point.point) + "\n")
         file.flush()
         solution = variable_neighborhood_search(point, neighborhood_param, max_radius, data, file)
         file.write("Found point: " + str(solution.point) + "\n")
