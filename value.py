@@ -175,48 +175,51 @@ def variable_neighborhood_search(init_solution, search_proportion, max_neighborh
 
 
 def run_file(datafile):
-    neighborhood_param = 1 / 300
-    max_radius = 20
-    file = open("results/" + datafile + ".txt", "a")
+    # neighborhood_param = 1 / 300
+    # max_radius = 20
+    # file = open("results/" + datafile + ".txt", "a")
     data = Data(A, P, udzial, czyN, u, w, N)
-    points = gen_starting_points(data)
+    # points = gen_starting_points(data)
+    point = np.loadtxt("value.txt", dtype=np.int)
+    value = cost_value_function(point, data)
+    print(value)
 
-    # # calculation for cost function
-    # print("File - " + datafile)
-    # file.write("File - " + datafile + "\n")
-    # print("Cost function")
-    # file.write("---Cost function---\n")
-    # file.flush()
-    # for i, point in enumerate(points):
-    #     print("Calculating point: " + str(i) + " neighborhood param: "
-    #           + str(neighborhood_param) + " max radius: " + str(max_radius) + " end at: count = " + str(10 * A * P))
-    #     file.write("Calculating point: " + str(i) + " neighborhood param: "
-    #                + str(neighborhood_param) + " max radius: " + str(max_radius) + "\n"
-    #                + "Point:\n")
-    #     np.savetxt(file, point.point.astype(int), fmt='%i')
-    #     file.flush()
-    #     variable_neighborhood_search(point, neighborhood_param, max_radius, data, file)
-    #     file.flush()
+    # # # # calculation for cost function
+    # # # print("File - " + datafile)
+    # # # file.write("File - " + datafile + "\n")
+    # # # print("Cost function")
+    # # # file.write("---Cost function---\n")
+    # # # file.flush()
+    # # # for i, point in enumerate(points):
+    # # #     print("Calculating point: " + str(i) + " neighborhood param: "
+    # # #           + str(neighborhood_param) + " max radius: " + str(max_radius) + " end at: count = " + str(10 * A * P))
+    # # #     file.write("Calculating point: " + str(i) + " neighborhood param: "
+    # # #                + str(neighborhood_param) + " max radius: " + str(max_radius) + "\n"
+    # # #                + "Point:\n")
+    # # #     np.savetxt(file, point.point.astype(int), fmt='%i')
+    # # #     file.flush()
+    # # #     variable_neighborhood_search(point, neighborhood_param, max_radius, data, file)
+    # # #     file.flush()
 
-    # calculation for fix function
-    global fix_function
-    fix_function = True
-    print("File - " + datafile)
-    file.write("File - " + datafile + "\n")
-    print("Fix function")
-    file.write("---Fix function---\n")
-    file.flush()
-    for i, point in enumerate(points):
-        print("Calculating point: " + str(i) + " neighborhood param: "
-              + str(neighborhood_param) + " max radius: " + str(max_radius) + " end at: count = " + str(10 * A * P))
-        file.write("Calculating point: " + str(i) + " neighborhood param: "
-                   + str(neighborhood_param) + " max radius: " + str(max_radius) + "\n"
-                   + "Point: with value - " +str(point.value) + "\n")
-        np.savetxt(file, point.point.astype(int), fmt='%i')
-        file.flush()
-        variable_neighborhood_search(point, neighborhood_param, max_radius, data, file)
-        file.flush()
-    file.close()
+    # # # calculation for fix function
+    # # global fix_function
+    # # fix_function = True
+    # # print("File - " + datafile)
+    # # file.write("File - " + datafile + "\n")
+    # # print("Fix function")
+    # # file.write("---Fix function---\n")
+    # # file.flush()
+    # # for i, point in enumerate(points):
+    # #     print("Calculating point: " + str(i) + " neighborhood param: "
+    # #           + str(neighborhood_param) + " max radius: " + str(max_radius) + " end at: count = " + str(10 * A * P))
+    # #     file.write("Calculating point: " + str(i) + " neighborhood param: "
+    # #                + str(neighborhood_param) + " max radius: " + str(max_radius) + "\n"
+    # #                + "Point: with value - " +str(point.value) + "\n")
+    # #     np.savetxt(file, point.point.astype(int), fmt='%i')
+    # #     file.flush()
+    # #     variable_neighborhood_search(point, neighborhood_param, max_radius, data, file)
+    # #     file.flush()
+    # # file.close()
 
 if __name__ == "__main__":
     datafiles = os.listdir("data")
