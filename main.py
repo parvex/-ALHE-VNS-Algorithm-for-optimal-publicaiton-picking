@@ -181,22 +181,22 @@ def run_file(datafile):
     data = Data(A, P, udzial, czyN, u, w, N)
     points = gen_starting_points(data)
 
-    # # calculation for cost function
-    # print("File - " + datafile)
-    # file.write("File - " + datafile + "\n")
-    # print("Cost function")
-    # file.write("---Cost function---\n")
-    # file.flush()
-    # for i, point in enumerate(points):
-    #     print("Calculating point: " + str(i) + " neighborhood param: "
-    #           + str(neighborhood_param) + " max radius: " + str(max_radius) + " end at: count = " + str(10 * A * P))
-    #     file.write("Calculating point: " + str(i) + " neighborhood param: "
-    #                + str(neighborhood_param) + " max radius: " + str(max_radius) + "\n"
-    #                + "Point:\n")
-    #     np.savetxt(file, point.point.astype(int), fmt='%i')
-    #     file.flush()
-    #     variable_neighborhood_search(point, neighborhood_param, max_radius, data, file)
-    #     file.flush()
+    # calculation for cost function
+    print("File - " + datafile)
+    file.write("File - " + datafile + "\n")
+    print("Cost function")
+    file.write("---Cost function---\n")
+    file.flush()
+    for i, point in enumerate(points):
+        print("Calculating point: " + str(i) + " neighborhood param: "
+              + str(neighborhood_param) + " max radius: " + str(max_radius) + " end at: count = " + str(10 * A * P))
+        file.write("Calculating point: " + str(i) + " neighborhood param: "
+                   + str(neighborhood_param) + " max radius: " + str(max_radius) + "\n"
+                   + "Point:\n")
+        np.savetxt(file, point.point.astype(int), fmt='%i')
+        file.flush()
+        variable_neighborhood_search(point, neighborhood_param, max_radius, data, file)
+        file.flush()
 
     # calculation for fix function
     global fix_function
@@ -221,9 +221,10 @@ def run_file(datafile):
 if __name__ == "__main__":
     datafiles = os.listdir("data")
     np.seterr(divide='ignore', invalid='ignore')
-    #updating global variables
-    exec(open("data/" + datafiles[2]).read())
-    N = sum(czyN)
-    run_file(datafiles[2])
+    for datafile in datafiles:
+        #updating global variables
+        exec(open("data/" + datafile).read())
+        N = sum(czyN)
+        run_file(datafile)
 
     print("PROGRAM END")
